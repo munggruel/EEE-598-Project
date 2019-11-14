@@ -93,6 +93,7 @@ def main():
     # generate and display fake images
     test_imgs = next(iter(data_loader_src))[0]
     show_images(test_imgs, (8, 8), 16, 'Testing images (Natural)', 'natural_test')
+    test_imgs = test_imgs.cuda() if cuda else test_imgs
     fake_imgs = generator(test_imgs).detach()
     show_images(fake_imgs.cpu(), (8, 8), 16, 'Fake images (Cartoon)', 'cartoon_fake')
 
