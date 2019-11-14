@@ -15,7 +15,7 @@ def prepare_celeba_data(path, batch_size, image_size, workers):
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                                     ])
     data_set = datasets.ImageFolder(root=path, transform=transform)
-    return DataLoader(data_set, batch_size=batch_size, shuffle=True, num_workers=workers)
+    return DataLoader(data_set, batch_size=batch_size, shuffle=False, num_workers=workers)
 
 
 def prepare_cartoon_data(path, batch_size, image_size, workers):
@@ -25,7 +25,7 @@ def prepare_cartoon_data(path, batch_size, image_size, workers):
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                                     ])
     data_set = datasets.ImageFolder(root=path, transform=transform)
-    return DataLoader(data_set, batch_size=batch_size, shuffle=True, num_workers=workers)
+    return DataLoader(data_set, batch_size=batch_size, shuffle=False, num_workers=workers)
 
 
 def show_images(imgs, fig_size, num_of_images, title, name):
@@ -34,7 +34,7 @@ def show_images(imgs, fig_size, num_of_images, title, name):
     # plt.title(title)
     # plt.imshow(np.transpose(vutils.make_grid(imgs[:num_of_images], padding=2, normalize=True), (1, 2, 0)))
     plt.imsave('./data/' + name + '.png',
-               np.transpose(vutils.make_grid(imgs[:num_of_images], padding=2, normalize=True), (1, 2, 0)))
+               np.transpose(vutils.make_grid(imgs[:num_of_images], nrow=4, padding=2, normalize=True), (1, 2, 0)))
     plt.show()
 
 
@@ -111,8 +111,8 @@ def train_gan(data_loader_src, data_loader_tgt, net_G, net_D, loss, optim_D, opt
         # data_loader_tgt is data_loader_src's corresponding cartoon image
         for (Z, _), (X, _) in zip(data_loader_src, data_loader_tgt):
             # Train Discriminator
-            Z = Z.cuda() if gpu else X
-            y = y.cuda() if gpu else y
+            Z = Z.cuda() if gpu else Z
+            X = X.cuda() if gpu else X
             # here modify the input to the generator based on the approach
             Z_dash = Z
             X_dash = net_G(Z_dash)

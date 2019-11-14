@@ -3,7 +3,8 @@ import random
 from torch import nn, optim
 import datetime
 
-from models.cartoon_gan import Discriminator, Generator
+from models.cartoon_gan import Generator
+from models.dc_gan import Discriminator
 from utils.utils import *
 
 
@@ -21,17 +22,17 @@ def main():
     # Hyper parameters
     workers = 2
     batch_size = 128
-    image_size = 128  # change this according to dataset dimensions
+    image_size = 128
     nc = 3
     in_ngc = 3
     out_ngc = 3
     in_ndc = 3
     out_ndc = 1
-    ngf = 128  # change this according to dataset dimensions
-    ndf = 128  # change this according to dataset dimensions
+    ngf = 64
+    ndf = 32
     learning_rate = 0.0005
     beta1 = 0.5
-    epochs = 10
+    epochs = 100
     gpu = True
     load_saved_model = False
 
@@ -53,18 +54,18 @@ def main():
     cuda = True if gpu and torch.cuda.is_available() else False
 
     # load CelebA dataset
-    download_path = '/home/pbuddare/EEE_598/Assignment_3/data/CelebA'
-    # download_path = '/Users/prasanth/Academics/ASU/FALL_2019/EEE_598_CIU/Assignment_3/data/CelebA'
+    download_path = '/home/pbuddare/EEE_598/data/CelebA'
+    # download_path = '/Users/prasanth/Academics/ASU/FALL_2019/EEE_598_CIU/data/Project/CelebA'
     data_loader_src = prepare_celeba_data(download_path, batch_size, image_size, workers)
 
     # load respective cartoon dataset
-    download_path = '/home/pbuddare/EEE_598/Assignment_3/data/Cartoon'
-    # download_path = '/Users/prasanth/Academics/ASU/FALL_2019/EEE_598_CIU/Assignment_3/data/CelebA'
+    download_path = '/home/pbuddare/EEE_598/data/Cartoon'
+    # download_path = '/Users/prasanth/Academics/ASU/FALL_2019/EEE_598_CIU/data/Project/Cartoon'
     data_loader_tgt = prepare_cartoon_data(download_path, batch_size, image_size, workers)
 
     # show sample images
-    show_images(next(iter(data_loader_src))[0], (8, 8), 40, 'Training images (Natural)', 'natural_train')
-    show_images(next(iter(data_loader_tgt))[0], (8, 8), 40, 'Training images (Cartoon)', 'cartoon_train')
+    show_images(next(iter(data_loader_src))[0], (8, 8), 16, 'Training images (Natural)', 'natural_train')
+    show_images(next(iter(data_loader_tgt))[0], (8, 8), 16, 'Training images (Cartoon)', 'cartoon_train')
 
     # create generator and discriminator networks
     generator = Generator(in_ngc, out_ngc, ngf)
@@ -72,8 +73,6 @@ def main():
     if cuda:
         generator.cuda()
         discriminator.cuda()
-    generator.apply(weights_init)
-    discriminator.apply(weights_init)
 
     # loss function and optimizers
     criterion = nn.BCELoss()
@@ -85,17 +84,17 @@ def main():
                                optimizer_d, optimizer_g, batch_size, epochs, cuda)
 
     # save parameters
-    # current_time = str(datetime.datetime.now().time()).replace(':', '').replace('.', '') + '.pth'
-    # g_path = './problem_4_1_G_' + current_time
-    # d_path = './problem_4_1_D_' + current_time
-    # torch.save(generator.state_dict(), g_path)
-    # torch.save(discriminator.state_dict(), d_path)
+    current_time = str(datetime.datetime.now().time()).replace(':', '').replace('.', '') + '.pth'
+    g_path = './project_G_' + current_time
+    d_path = './project_D_' + current_time
+    torch.save(generator.state_dict(), g_path)
+    torch.save(discriminator.state_dict(), d_path)
 
     # generate and display fake images
     test_imgs = next(iter(data_loader_src))[0]
-    show_images(test_imgs, (8, 8), 40, 'Testing images (Natural)', 'natural_test')
+    show_images(test_imgs, (8, 8), 16, 'Testing images (Natural)', 'natural_test')
     fake_imgs = generator(test_imgs).detach()
-    show_images(fake_imgs.cpu(), (8, 8), 40, 'Fake images (Cartoon)', 'cartoon_fake')
+    show_images(fake_imgs.cpu(), (8, 8), 16, 'Fake images (Cartoon)', 'cartoon_fake')
 
 
 if __name__ == '__main__':
