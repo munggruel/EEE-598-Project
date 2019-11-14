@@ -48,6 +48,8 @@ class Generator(nn.Module):
             nn.Tanh()
         )
 
+        weights_init(self)
+
     def forward(self, x):
         x = self.down_convs(x)
         x = self.resnet_blocks(x)
@@ -56,7 +58,7 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, in_channels, out_channels, ndf=32):
+    def __init__(self, in_channels, out_channels, ndf=64):
         super(Discriminator, self).__init__()
         self.convs = nn.Sequential(
             # k3n32s1
@@ -85,6 +87,24 @@ class Discriminator(nn.Module):
             nn.Sigmoid()
         )
 
+        weights_init(self)
+
     def forward(self, x):
         x = self.convs(x)
         return x
+
+
+def weights_init(net):
+    for m in net.modules():
+        if isinstance(m, nn.Conv2d):
+            m.weight.data.normal_(0, 0.02)
+            m.bias.data.zero_()
+        elif isinstance(m, nn.ConvTranspose2d):
+            m.weight.data.normal_(0, 0.02)
+            m.bias.data.zero_()
+        elif isinstance(m, nn.Linear):
+            m.weight.data.normal_(0, 0.02)
+            m.bias.data.zero_()
+        elif isinstance(m, nn.BatchNorm2d):
+            m.weight.data.fill_(1)
+            m.bias.data.zero_()

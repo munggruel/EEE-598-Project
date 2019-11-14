@@ -2,3 +2,8 @@
 .DS_Store
 venv/
 __pycache__/
+
+# helper scripts
+sbatch_gpu.sh
+copy_files.sh
+run_script.sh
