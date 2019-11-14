@@ -6,7 +6,12 @@ import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-
+import dlib
+from imutils import face_utils
+import imutils
+import dlib
+import cv2
+from utils.transforms.getLandmarks import GetLandmarksImage
 
 def prepare_celeba_data(path, batch_size, image_size, workers):
     transform = transforms.Compose([transforms.Resize(image_size),
@@ -20,6 +25,16 @@ def prepare_celeba_data(path, batch_size, image_size, workers):
 
 def prepare_cartoon_data(path, batch_size, image_size, workers):
     transform = transforms.Compose([transforms.Resize(image_size),
+                                    transforms.CenterCrop(image_size),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                                    ])
+    data_set = datasets.ImageFolder(root=path, transform=transform)
+    return DataLoader(data_set, batch_size=batch_size, shuffle=False, num_workers=workers)
+
+def prepare_cartoon_data_with_landmarks(path, batch_size, image_size, workers):
+    transform = transforms.Compose([GetLandmarksImage(),
+                                    transforms.Resize(image_size),
                                     transforms.CenterCrop(image_size),
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
@@ -137,3 +152,29 @@ def train_gan(data_loader_src, data_loader_tgt, net_G, net_D, loss, optim_D, opt
         list_loss_G.append(loss_gen)
 
     return list_loss_G, list_loss_D
+
+def landmark(image):
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor("pretrained_models/shape_predictor_68_face_landmarks.dat")
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # detect faces in the grayscale image
+    rects = detector(gray, 1)
+    print("{} rects predicted".format(len(rects)))
+
+    blackImage = np.zeros((image.shape))
+    # loop over the face detections
+    for (i, rect) in enumerate(rects):
+        shape = predictor(gray, rect)
+        shape = face_utils.shape_to_np(shape)
+
+        # loop over the (x, y)-coordinates for the facial landmarks
+        # and draw them on the image
+        for (x, y) in shape:
+            cv2.circle(blackImage, (x, y), 1, (255, 255, 255), thickness=2)
+
+    return blackImage
+
+# if __name__ == "__main__":
+#     resultImage = landmark(cv2.imread("/Users/yvtheja/Documents/ASU/EEE598/cartoonize/data/17349955_1.jpg", cv2.IMREAD_COLOR))
+#     cv2.imwrite("boom.jpg", resultImage)
