@@ -3,8 +3,9 @@ import random
 from torch import nn, optim
 import datetime
 
-from models.cartoon_gan import Generator
-from models.dc_gan import Discriminator
+from models.networks import ResnetGenerator as Generator
+from models.networks import NLayerDiscriminator as Discriminator
+from models.networks import init_net
 from utils.utils import *
 
 
@@ -71,13 +72,15 @@ def main():
 
     # create generator and discriminator networks
     generator = Generator(in_ngc, out_ngc, ngf)
-    discriminator = Discriminator(in_ndc, out_ndc, ndf)
+    discriminator = Discriminator(in_ndc, ndf)
     if cuda:
         generator.cuda()
         discriminator.cuda()
+    init_net(generator, gpu_ids=[0])
+    init_net(discriminator, gpu_ids=[0])
 
     # loss function and optimizers
-    criterion_GAN = nn.BCELoss()
+    criterion_GAN = nn.BCEWithLogitsLoss()
     criterion_L1 = nn.L1Loss()
     optimizer_g = optim.Adam(generator.parameters(), lr=learning_rate, betas=(beta1, 0.999))
     optimizer_d = optim.Adam(discriminator.parameters(), lr=learning_rate, betas=(beta1, 0.999))
