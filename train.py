@@ -37,6 +37,7 @@ def main():
     epochs = 100
     gpu = True
     load_saved_model = False
+    modelType = 1 # 1 -> complete image as input | 2 -> Only landmarks as input to GAN
 
     # print hyper parameters
     print(f'number of workers : {workers}')
@@ -57,12 +58,12 @@ def main():
     cuda = True if gpu and torch.cuda.is_available() else False
 
     # load CelebA dataset
-    download_path = '/home/pbuddare/EEE_598/data/CelebA'
+    download_path = '/Users/yvtheja/Documents/RealCartoonFaces/CelebA'
     # download_path = '/Users/prasanth/Academics/ASU/FALL_2019/EEE_598_CIU/data/Project/CelebA'
     data_loader_src = prepare_celeba_data(download_path, batch_size, image_size, workers)
 
     # load respective cartoon dataset
-    download_path = '/home/pbuddare/EEE_598/data/Cartoon'
+    download_path = '/Users/yvtheja/Downloads/cartoonset10k'
     # download_path = '/Users/prasanth/Academics/ASU/FALL_2019/EEE_598_CIU/data/Project/Cartoon'
     data_loader_tgt = prepare_cartoon_data(download_path, batch_size, image_size, workers)
 

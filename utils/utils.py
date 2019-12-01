@@ -82,10 +82,11 @@ def train_generator(real_A, real_B, fake_B, net_D, loss_G, loss_L1, optim_G, sf,
     loss_G_GAN = loss_G(pred_fake, real_label(pred_fake, gpu))
 
     # 2. Preserving the style while generating
-    loss_G_L1 = loss_L1(fake_B, real_B)
+    # loss_G_L1 = loss_L1(fake_B, real_B)
 
     # combined loss
-    loss_G = loss_G_GAN + sf * loss_G_L1
+    # loss_G = loss_G_GAN + sf * loss_G_L1
+    loss_G = loss_G_GAN
 
     loss_G.backward()
 
