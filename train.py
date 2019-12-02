@@ -58,18 +58,16 @@ def main():
     cuda = True if gpu and torch.cuda.is_available() else False
 
     # load CelebA dataset
-    download_path = '/Users/yvtheja/Documents/RealCartoonFaces/CelebA'
-    # download_path = '/Users/prasanth/Academics/ASU/FALL_2019/EEE_598_CIU/data/Project/CelebA'
+    download_path = "/Users/yvtheja/Documents/EEE598ProjectTrainingData/realFacesLandmarks"
     data_loader_src = prepare_celeba_data(download_path, batch_size, image_size, workers)
 
     # load respective cartoon dataset
-    download_path = '/Users/yvtheja/Downloads/cartoonset10k'
-    # download_path = '/Users/prasanth/Academics/ASU/FALL_2019/EEE_598_CIU/data/Project/Cartoon'
+    download_path = "/Users/yvtheja/Documents/EEE598ProjectTrainingData/cartoonImages"
     data_loader_tgt = prepare_cartoon_data(download_path, batch_size, image_size, workers)
 
-    # show sample images
-    show_images(next(iter(data_loader_src))[0], (8, 8), 16, 'Training images (Natural)', 'human_real')
-    show_images(next(iter(data_loader_tgt))[0], (8, 8), 16, 'Training images (Cartoon)', 'cartoon_real')
+    # # show sample images
+    # show_images(next(iter(data_loader_src))[0], (8, 8), 16, 'Training images (Natural)', 'human_real')
+    # show_images(next(iter(data_loader_tgt))[0], (8, 8), 16, 'Training images (Cartoon)', 'cartoon_real')
 
     # create generator and discriminator networks
     generator = Generator(in_ngc, out_ngc, ngf)
